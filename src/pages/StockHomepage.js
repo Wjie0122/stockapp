@@ -1,8 +1,9 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     StockPageContainer,
     PageTitle,
+    StockButtonContainer,
     StockContainer,
     StockTable,
     StockTableHeader,
@@ -13,39 +14,36 @@ import { ThemeProvider } from "styled-components";
 import { theme } from "../theme";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button/Button";
+import { db } from "../backend/firebase";
+import { collection, getDocs } from "firebase/firestore"; 
 
 const StockHomepage = () => {
     const navigate = useNavigate();
-    const navigateUpdate = () => {
-      navigate("/stock/update");
+    const navigateOrderPage = () => {
+      navigate("/stock/order");
+    };
+    const navigateStockAddPage = () => {
+        navigate("/stock/add_stock");
+      };
+
+    const [products, setProducts] = useState([]);
+
+    const fetchProducts = async () => {
+        try {
+            const querySnapshot = await getDocs(collection(db, "products"));
+            const productsData = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setProducts(productsData);
+        } catch (error) {
+            console.error("Error fetching products: ", error);
+        }
     };
 
-    const dummyData = [
-        { 
-            id: 1, 
-            name: 'Stock A', 
-            price: '$100',
-            quantity: 10
-        },
-        { 
-            id: 2, 
-            name: 'Stock B', 
-            price: '$200',
-            quantity: 10
-        },
-        { 
-            id: 3, 
-            name: 'Stock C', 
-            price: '$300',
-            quantity: 8
-        },
-        { 
-            id: 4, 
-            name: 'Stock D', 
-            price: '$400',
-            quantity: 10
-        }
-    ];
+    useEffect(() => {
+        fetchProducts();
+    },[]);
 
     
   
@@ -54,20 +52,51 @@ const StockHomepage = () => {
         <StockPageContainer>
             <PageTitle>Stock Dashboard</PageTitle>
             <StockContainer>
+                <StockButtonContainer>
+                    <Button 
+                        defaultColor={theme.primary} 
+                        filledColor={theme.primary} 
+                        filled={false} 
+                        onClick={() => ""} 
+                    >
+                        Add Product
+                    </Button>
+                    <Button 
+                        defaultColor={theme.primary} 
+                        filledColor={theme.primary} 
+                        filled={false} 
+                        onClick={() => navigateStockAddPage()} 
+                    >
+                        Add Stock
+                    </Button>
+                    <Button 
+                        defaultColor={theme.primary} 
+                        filledColor={theme.primary} 
+                        filled={false} 
+                        onClick={() => navigateOrderPage()} 
+                    >
+                        Create Order
+                    </Button>
+                </StockButtonContainer>
                 <StockTable>
                     <StockTableRow>
                         <StockTableHeader>Name</StockTableHeader>
                         <StockTableHeader>Price</StockTableHeader>
                         <StockTableHeader>Quantity</StockTableHeader>
-                        <StockTableHeader>Action</StockTableHeader>
+                        <StockTableHeader colspan="2">Action</StockTableHeader>
                     </StockTableRow>
-                    {dummyData.map((stock) => (
-                        <StockTableRow key={stock.id}>
-                            <StockTableData>{stock.name}</StockTableData>
-                            <StockTableData>{stock.price}</StockTableData>
-                            <StockTableData>{stock.quantity}</StockTableData>
+                    {products.map((stock) => (
+                        <StockTableRow key={stock.productID}>
+                            <StockTableData>{stock.productName}</StockTableData>
+                            <StockTableData>RM {stock.productPrice}</StockTableData>
+                            <StockTableData>{stock.productQuantity}</StockTableData>
                             <StockTableData>
-                                <Button defaultColor={theme.primary} filledColor={theme.primary} filled={false} onClick={() => navigateUpdate()}>
+                                <Button defaultColor={theme.statusGood} filledColor={theme.statusGood} filled={false} onClick={() => ""}>
+                                    Edit
+                                </Button>
+                            </StockTableData>
+                            <StockTableData>
+                                <Button defaultColor={theme.statusError} filledColor={theme.statusError} filled={false} onClick={() => ""}>
                                     Remove
                                 </Button>
                             </StockTableData>
