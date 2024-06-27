@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Link } from 'react-router-dom';
 
 export const StockPageContainer = styled.div`
     width: 95%;
@@ -32,7 +33,7 @@ export const StockButtonContainer = styled.div`
 `;
 
 export const StockTable = styled.table`
-    width: 80%;
+    width: 90%;
     border-collapse: collapse;
     margin: 20px 0;
     font-size: 1.2rem;
@@ -145,4 +146,23 @@ export const StockOrderLabel = styled.label`
 export const StockOrderSelect = styled.select`
     padding: 10px;
     font-size: 1rem;
+`;
+export const AppPageContainer = styled.div`
+    font-size: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: ${props => props.theme.background};
+`;
+
+export const StyledLink = styled(Link)`
+  color: #333333;
+  text-decoration: none;
+  font-weight: bold;
+  &:hover {
+    color: #2980b9;
+    text-decoration: underline;
+  }
 `;

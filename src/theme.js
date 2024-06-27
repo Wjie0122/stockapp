@@ -1,5 +1,5 @@
 export const theme = {
-  primary: "#ecb3ff",
+  primary: "#d278ff",
   background: "#FBFBFB",
   text: "#333333",
   secondaryLight: "#EEFDFF",
@@ -14,7 +14,7 @@ export const theme = {
 };
 
 export const darktheme = {
-  primary: "#ecb3ff",
+  primary: "#d278ff",
   background: "#333333",
   text: "#FBFBFB",
   secondaryLight: "#EEFDFF",

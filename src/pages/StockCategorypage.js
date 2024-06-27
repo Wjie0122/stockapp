@@ -8,23 +8,21 @@ import {
     StockTable,
     StockTableHeader,
     StockTableRow,
-    StockTableData
+    StockTableData,
+    StyledLink 
 } from "./StockPageStyles";
 import { ThemeProvider } from "styled-components";
 import { theme } from "../theme";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from "../components/Button/Button";
 import { db } from "../backend/firebase";
-import { collection, getDoc, doc, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore"; 
+import { Link } from 'react-router-dom';
 
-const StockHomepage = (props) => {
-    const { categoryID } = useParams(); 
+const StockCategorypage = () => {
     const navigate = useNavigate();
-    const navigateAppHomePage = () => {
-        navigate("/");
-      };
     const navigateStockHomePage = () => {
-        navigate("/stock");
+        navigate("/");
       };
     const navigateStockOrderPage = () => {
       navigate("/stock/order");
@@ -33,37 +31,24 @@ const StockHomepage = (props) => {
         navigate("/stock/add_stock");
       };
 
-    const [products, setProducts] = useState([]);
-    const [categoryAttributes, setCategoryAttributes] = useState({ color: false, size: false });
+    const [categories, setCategories] = useState([]);
 
-    const fetchProducts = async () => {
+    const fetchCategories = async () => {
         try {
-            const q = query(collection(db, "products"), where("categoryID", "==", categoryID));
-            const querySnapshot = await getDocs(q);
-            const productsData = querySnapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data()
+            const querySnapshot = await getDocs(collection(db, "categories"));
+            const categoriesData = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
             }));
-            setProducts(productsData);
+            setCategories(categoriesData);
         } catch (error) {
-            console.error("Error fetching products: ", error);
-        }
-    };
-    const fetchCategoryAttributes = async () => {
-        try {
-            const categoryDoc = await getDoc(doc(db, "categories", categoryID));
-            if (categoryDoc.exists()) {
-                setCategoryAttributes(categoryDoc.data().attributes);
-            }
-        } catch (error) {
-            console.error("Error fetching category attributes: ", error);
+            console.error("Error fetching categories: ", error);
         }
     };
 
     useEffect(() => {
-        fetchProducts();
-        fetchCategoryAttributes();
-    },[categoryID]);
+        fetchCategories();
+    },[]);
 
     
   
@@ -77,7 +62,7 @@ const StockHomepage = (props) => {
                         defaultColor={theme.primary} 
                         filledColor={theme.primary} 
                         filled={false} 
-                        onClick={() => navigateAppHomePage()} 
+                        onClick={() => navigateStockHomePage()} 
                     >
                         Home
                     </Button>
@@ -85,17 +70,9 @@ const StockHomepage = (props) => {
                         defaultColor={theme.primary} 
                         filledColor={theme.primary} 
                         filled={false} 
-                        onClick={() => navigateStockHomePage()} 
-                    >
-                        Back
-                    </Button>
-                    <Button 
-                        defaultColor={theme.primary} 
-                        filledColor={theme.primary} 
-                        filled={false} 
                         onClick={() => ""} 
                     >
-                        Add Product
+                        Add Category
                     </Button>
                     <Button 
                         defaultColor={theme.primary} 
@@ -116,28 +93,16 @@ const StockHomepage = (props) => {
                 </StockButtonContainer>
                 <StockTable>
                     <StockTableRow>
-                        <StockTableHeader>Code</StockTableHeader>
                         <StockTableHeader>Name</StockTableHeader>
-                        <StockTableHeader>Price</StockTableHeader>
-                        <StockTableHeader>PV</StockTableHeader>
-                        {categoryAttributes.size && <StockTableHeader>Size</StockTableHeader>}
-                        {categoryAttributes.color && <StockTableHeader>Color</StockTableHeader>}
-                        <StockTableHeader>Quantity</StockTableHeader>
-                        <StockTableHeader colSpan="2">Action</StockTableHeader>
+                        <StockTableHeader colspan="2">Action</StockTableHeader>
                     </StockTableRow>
-                    {products.map((stock) => (
-                        <StockTableRow key={stock.productID}>
-                            <StockTableData>{stock.productID}</StockTableData>
+                    {categories.map((stock) => (
+                        <StockTableRow key={stock.id}>
                             <StockTableData>
-                                {stock.productName}
-                                {categoryAttributes.size&&stock.size ? `--${stock.size}` : ""}
-                                {categoryAttributes.color&&stock.color ? `--${stock.color}` : ""}
-                                </StockTableData>
-                            <StockTableData>RM {stock.productPrice}</StockTableData>
-                            <StockTableData>{stock.pv} pts </StockTableData>
-                            {categoryAttributes.size && <StockTableData>{stock.size}</StockTableData>}
-                            {categoryAttributes.color && <StockTableData>{stock.color}</StockTableData>}
-                            <StockTableData>{stock.productQuantity}</StockTableData>
+                                <StyledLink  to={`/stock/${stock.id}`}>
+                                    {stock.name}
+                                </StyledLink >
+                            </StockTableData>
                             <StockTableData>
                                 <Button defaultColor={theme.statusGood} filledColor={theme.statusGood} filled={false} onClick={() => ""}>
                                     Edit
@@ -158,4 +123,4 @@ const StockHomepage = (props) => {
   };
 
   
-export default StockHomepage;
+export default StockCategorypage;
