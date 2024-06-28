@@ -1,5 +1,4 @@
-import { useRef } from "react";
-import { useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   EmptyModalCloseContainer,
   EmptyModalContainer,
@@ -7,6 +6,9 @@ import {
   ModalContainer,
   ModalContent,
   ModalTitle,
+  CategoryInput,
+  CategoryOption,
+  CategorySelect
 } from "./ModalStyles";
 import { ThemeProvider } from "styled-components";
 import { theme } from "../../theme";
@@ -117,32 +119,53 @@ const Modal = (props) => {
             </ModalButtonContainer>
           </ModalContainer>
         );
-      case "action2":
-        return (
-          <ModalContainer display={props.show} ref={modalRef}>
-            <ModalContent>{props.children}</ModalContent>
-            <ModalButtonContainer>
-              <Button
-                filled={true}
-                filledColor={props.actionButtonColor}
-                defaultColor={props.actionButtonColor}
-                onClick={() => {
-                  closeModal();
-                  props.actionButtonClick();
-                }}
+        case "addCategory":
+          return (
+            <ModalContainer display={props.show} ref={modalRef}>
+              <ModalTitle>{props.modalTitle}</ModalTitle>
+              <ModalContent>
+                {props.modalContent}
+                <CategoryInput
+                  type="text"
+                  value={props.inputValue}
+                  onChange={(e) => props.setInputValue(e.target.value)}
+                  placeholder="Enter category name"
+                  required
+                />
+                <CategorySelect
+                value={props.attribute}
+                onChange={(e) =>
+                  props.setAttribute(e.target.value)
+                }
+                required
               >
-                {props.actionButtonText ? props.actionButtonText : "OK"}
-              </Button>
-              <Button
-                onClick={() => {
-                  closeModal();
-                }}
-              >
-                {props.closingButtonText ? props.closingButtonText : "Cancel"}
-              </Button>
-            </ModalButtonContainer>
-          </ModalContainer>
-        );
+                <CategoryOption value="">Select Color/Size Attribute</CategoryOption>
+                <CategoryOption value="true">Yes</CategoryOption>
+                <CategoryOption value="false">No</CategoryOption>
+              </CategorySelect>
+              </ModalContent>
+              <ModalButtonContainer>
+                <Button
+                  filled={true}
+                  filledColor={props.actionButtonColor}
+                  defaultColor={props.actionButtonColor}
+                  onClick={() => {
+                    closeModal();
+                    props.actionButtonClick(props.inputValue, props.attribute);
+                  }}
+                >
+                  {props.actionButtonText ? props.actionButtonText : "OK"}
+                </Button>
+                <Button
+                  onClick={() => {
+                    closeModal();
+                  }}
+                >
+                  {props.closingButtonText ? props.closingButtonText : "Cancel"}
+                </Button>
+              </ModalButtonContainer>
+            </ModalContainer>
+          );
       default:
         return (
           <ModalContainer display={props.show} ref={modalRef}>

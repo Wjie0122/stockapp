@@ -16,52 +16,94 @@ import { ThemeProvider } from "styled-components";
 import { theme } from "../theme";
 import { useNavigate } from "react-router-dom";
 import { db } from "../backend/firebase";
-import { collection, addDoc, getDocs, doc, updateDoc, getDoc} from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
+import StockRow from '../components/StockRow/StockRow';
 
 const OrderPage = () => {
     const [customerName, setCustomerName] = useState('');
     const [date, setDate] = useState('');
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState('');
     const [products, setProducts] = useState([]);
     const [availableProducts, setAvailableProducts] = useState([]);
-    const [selectedProduct, setSelectedProduct] = useState('');
+    const [selectedProduct, setSelectedProduct] = useState(''); // Track selected product
     const [orderRows, setOrderRows] = useState([]);
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            const productsCollection = await getDocs(collection(db, 'products'));
-            const productsList = productsCollection.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            setProducts(productsList);
-            setAvailableProducts(productsList); // Initialize available products
-        };
+    const fetchCategories = async () => {
+        const categoriesCollection = await getDocs(collection(db, 'categories'));
+        const categoriesList = categoriesCollection.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        setCategories(categoriesList);
+    };
 
+    const fetchProducts = async () => {
+        const productsCollection = await getDocs(collection(db, 'products'));
+        const productsList = productsCollection.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+    
+        // Use a Set to track unique product IDs
+        const uniqueProductIDs = new Set();
+        const uniqueProducts = [];
+    
+        productsList.forEach(product => {
+            // Check if product ID is already in the Set
+            if (!uniqueProductIDs.has(product.productID)) {
+                uniqueProductIDs.add(product.productID); // Add product ID to Set
+                uniqueProducts.push(product); // Push product to uniqueProducts array
+            }
+        });
+    
+        setProducts(uniqueProducts); // Set all products (if needed)
+        setAvailableProducts(uniqueProducts); // Initialize available products with unique product IDs
+    };
+    
+    useEffect(() => {
+        fetchCategories();
         fetchProducts();
     }, []);
 
-    const handleProductNameChange = (value) => {
-        setSelectedProduct(value);
-        const selectedProduct = availableProducts.find(product => product.productName === value);
+    const handleCategoryChange = (value) => {
+        setSelectedCategory(value);
+        // Filter products based on selected category and exclude already selected products
+        const filteredProducts = products.filter(product => product.categoryID === value && !orderRows.find(row => row.productID === product.id));
+        setAvailableProducts(filteredProducts);
+        setSelectedProduct(''); // Reset selected product when category changes
+    };
 
-        if (selectedProduct) {
+    const handleProductNameChange = (value) => {
+        setSelectedProduct(value); // Set selected product name
+
+        const selectedProductObj = availableProducts.find(product => product.productName === value);
+
+        if (selectedProductObj) {
             const newOrderRow = {
-                productName: selectedProduct.productName,
-                productID: selectedProduct.id,
-                productQuantity: ''
+                productName: selectedProductObj.productName,
+                productID: selectedProductObj.productID,
+                productQuantity: '',
+                category: selectedCategory,
             };
             setOrderRows([...orderRows, newOrderRow]);
-            setAvailableProducts(availableProducts.filter(product => product !== selectedProduct));
+            setAvailableProducts(availableProducts.filter(product => product !== selectedProductObj));
         }
     };
 
     const handleRemoveRow = (index) => {
         const removedProduct = orderRows[index];
-        setAvailableProducts([...availableProducts, { id: removedProduct.productID, productName: removedProduct.productName }]);
+    
+        // Remove the row from the orderRows state
         setOrderRows(orderRows.filter((_, idx) => idx !== index));
+    
+        // Reset selected product to default (empty string)
+        setSelectedCategory('');
+        setSelectedProduct('');
     };
+    
 
     const handleUpdateStock = async (e) => {
         e.preventDefault();
@@ -128,47 +170,45 @@ const OrderPage = () => {
                     />
                     <StockOrderContainer>
                         <StockOrderRow>
-                            <StockOrderLabel>Product Name</StockOrderLabel>
+                            <StockOrderLabel>Category</StockOrderLabel>
                             <StockOrderSelect
-                                value={selectedProduct}
-                                onChange={(e) => handleProductNameChange(e.target.value)}
+                                value={selectedCategory}
+                                onChange={(e) => handleCategoryChange(e.target.value)}
                             >
-                                <option value="">Select a product</option>
-                                {availableProducts.map(product => (
-                                    <option key={product.id} value={product.productName}>
-                                        {product.productName}
+                                <option value="">Select a category</option>
+                                {categories.map(category => (
+                                    <option key={category.id} value={category.id}>
+                                        {category.name}
                                     </option>
                                 ))}
                             </StockOrderSelect>
                         </StockOrderRow>
-                        {orderRows.map((row, index) => (
-                            <StockOrderRow key={index}>
-                                <StockOrderLabel>Product</StockOrderLabel>
-                                <StockOrderInput
-                                    type="text"
-                                    value={row.productName}
-                                    readOnly
-                                    disabled
-                                />
-                                <StockOrderInput
-                                    type="text"
-                                    value={row.productID}
-                                    readOnly
-                                    hidden
-                                />
-                                <StockOrderLabel>Quantity</StockOrderLabel>
-                                <StockOrderInput
-                                    type="number"
-                                    value={row.productQuantity}
-                                    onChange={(e) => handleRowChange(index, 'productQuantity', e.target.value)}
-                                    required
-                                    placeholder="1,2,3,..."
-                                    min='1'
-                                />
-                                <RemoveRowButton type="button" onClick={() => handleRemoveRow(index)}>
-                                    Remove
-                                </RemoveRowButton>
+                        {selectedCategory && (
+                            <StockOrderRow>
+                                <StockOrderLabel>Product Name</StockOrderLabel>
+                                <StockOrderSelect
+                                    value={selectedProduct || ''}
+                                    onChange={(e) => handleProductNameChange(e.target.value)}
+                                >
+                                    <option value="">Select a product</option>
+                                    {availableProducts.map(product => (
+                                        <option key={product.id} value={product.productName}>
+                                            {product.productName}
+                                        </option>
+                                    ))}
+                                </StockOrderSelect>
                             </StockOrderRow>
+                        )}
+                        {orderRows.map((row, index) => (
+                            <StockRow
+                                key={index}
+                                productName={row.productName}
+                                productID={row.productID}
+                                productQuantity={row.productQuantity}
+                                category={row.category}
+                                onQuantityChange={(e) => handleRowChange(index, 'productQuantity', e.target.value)}
+                                onRemove={() => handleRemoveRow(index)}
+                            />
                         ))}
                     </StockOrderContainer>
                     <StockUpdateButton type="submit">Make An Order</StockUpdateButton>

@@ -43,3 +43,17 @@ export const EmptyModalCloseContainer = styled.div`
   align-items: center;
   display: ${(props) => (props.display ? "flex" : "none")};
 `;
+
+export const CategoryInput = styled.input`
+  padding: 10px;
+    font-size: 1rem;
+    margin: 10px;
+`;
+
+export const CategorySelect = styled.select`
+  padding: 10px;
+    font-size: 1rem;
+    margin: 10px;
+`;
+export const CategoryOption = styled.option`
+`;

@@ -84,13 +84,14 @@ export const StockUpdateForm = styled.form`
   display: flex;
   flex-direction: column;
   gap: 15px;
-  max-width: 400px;
+  width:80%;
   margin: auto;
 `;
 
 export const StockUpdateInput = styled.input`
   padding: 10px;
   font-size: 1rem;
+  max-width: 400px;
 `;
 
 export const StockUpdateButton = styled.button`
@@ -101,6 +102,8 @@ export const StockUpdateButton = styled.button`
   cursor: pointer;
   font-size: 1rem;
   border-radius: 5px;
+  width: 20%;
+  margin: 20px auto;
 `;
 
 

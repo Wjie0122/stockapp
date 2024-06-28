@@ -16,10 +16,11 @@ import { theme } from "../theme";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button/Button";
 import { db } from "../backend/firebase";
-import { collection, getDocs } from "firebase/firestore"; 
-import { Link } from 'react-router-dom';
+import { collection, getDocs, addDoc, query, where, deleteDoc,doc } from "firebase/firestore"; 
+import Modal from "../components/Modal/Modal";
 
 const StockCategorypage = () => {
+    
     const navigate = useNavigate();
     const navigateStockHomePage = () => {
         navigate("/");
@@ -31,7 +32,12 @@ const StockCategorypage = () => {
         navigate("/stock/add_stock");
       };
 
-    const [categories, setCategories] = useState([]);
+      const [categories, setCategories] = useState([]);
+      const [showAddModal, setShowAddModal] = useState(false);
+      const [inputValue, setInputValue] = useState("");
+      const [attribute, setAttribute] = useState("");
+      const [showErrorModal1, setShowErrorModal1] = useState(false);
+      const [showErrorModal2, setShowErrorModal2] = useState(false);
 
     const fetchCategories = async () => {
         try {
@@ -46,15 +52,96 @@ const StockCategorypage = () => {
         }
     };
 
+    const handleAddCategory = async (categoryName, attribute) => {
+        if (!categoryName || !attribute) {
+            setInputValue("");
+            setAttribute("");
+            setShowErrorModal2(true);
+            return;
+          }
+
+        try {
+            const capitalizedCategoryName = categoryName.toUpperCase();
+        
+            const q = query(collection(db, "categories"), where("name", "==", capitalizedCategoryName));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                setInputValue("");
+                setAttribute("");
+                setShowErrorModal1(true);
+            return;
+            }
+      
+          // Add a new document with a generated ID to the "categories" collection
+          const docRef = await addDoc(collection(db, "categories"), {
+            name: capitalizedCategoryName,
+            attribute: attribute === "true", // Convert attribute to boolean
+          });
+      
+          console.log("Document written with ID: ", docRef.id);
+            setInputValue("");
+            setAttribute("");
+      
+          fetchCategories(); // Refresh categories after adding
+        } catch (e) {
+          console.error("Error adding document: ", e);
+        }
+    };
+
+    const handleRemoveCategory = async (categoryId) => {
+        try {
+            await deleteDoc(doc(db, "categories", categoryId));
+            console.log("Document successfully deleted!");
+            fetchCategories(); // Refresh categories after deletion
+        } catch (error) {
+            console.error("Error removing document: ", error);
+        }
+    };
+
     useEffect(() => {
         fetchCategories();
     },[]);
 
-    
-  
     return (
       <ThemeProvider theme={theme}>
         <StockPageContainer>
+            <Modal
+                handleModalClose={() => {
+                    setShowErrorModal1(false);
+                }}
+                actionButtonText="OK"
+                actionButtonColor={theme.statusGood}
+                show={showErrorModal1}
+                modalTitle="Category Name exists!"
+                modalContent="Please use another name"
+            />
+            <Modal
+                handleModalClose={() => {
+                    setShowErrorModal2(false);
+                }}
+                actionButtonText="OK"
+                actionButtonColor={theme.statusGood}
+                show={showErrorModal2}
+                modalTitle="Missed Info!"
+                modalContent="Please fill in all the information"
+            />
+            <Modal
+                handleModalClose={() => {
+                    setShowAddModal(false);
+                }}
+                modalType="addCategory"
+                actionButtonText="Yes"
+                actionButtonColor={theme.statusGood}
+                actionButtonClick={handleAddCategory}
+                show={showAddModal}
+                modalTitle="Add Category"
+                modalContent="What you want to add?"
+                inputValue={inputValue}
+                setInputValue={setInputValue}
+                attribute={attribute}
+                setAttribute={setAttribute}
+            />
             <PageTitle>Stock Dashboard</PageTitle>
             <StockContainer>
                 <StockButtonContainer>
@@ -70,7 +157,7 @@ const StockCategorypage = () => {
                         defaultColor={theme.primary} 
                         filledColor={theme.primary} 
                         filled={false} 
-                        onClick={() => ""} 
+                        onClick={() => setShowAddModal(true)} 
                     >
                         Add Category
                     </Button>
@@ -109,7 +196,7 @@ const StockCategorypage = () => {
                                 </Button>
                             </StockTableData>
                             <StockTableData>
-                                <Button defaultColor={theme.statusError} filledColor={theme.statusError} filled={false} onClick={() => ""}>
+                                <Button defaultColor={theme.statusError} filledColor={theme.statusError} filled={false} onClick={() => handleRemoveCategory(stock.id)}>
                                     Remove
                                 </Button>
                             </StockTableData>
