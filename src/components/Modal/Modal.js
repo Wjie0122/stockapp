@@ -132,14 +132,15 @@ const Modal = (props) => {
                   placeholder="Enter category name"
                   required
                 />
+                  <br/>Has different Color/Size ?
                 <CategorySelect
-                value={props.attribute}
+                value={props.attributes}
                 onChange={(e) =>
-                  props.setAttribute(e.target.value)
+                  props.setAttributes(e.target.value)
                 }
                 required
               >
-                <CategoryOption value="">Select Color/Size Attribute</CategoryOption>
+                <CategoryOption value="">Select Color/Size Attributes</CategoryOption>
                 <CategoryOption value="true">Yes</CategoryOption>
                 <CategoryOption value="false">No</CategoryOption>
               </CategorySelect>
@@ -151,7 +152,7 @@ const Modal = (props) => {
                   defaultColor={props.actionButtonColor}
                   onClick={() => {
                     closeModal();
-                    props.actionButtonClick(props.inputValue, props.attribute);
+                    props.actionButtonClick(props.inputValue, props.attributes);
                   }}
                 >
                   {props.actionButtonText ? props.actionButtonText : "OK"}
@@ -166,6 +167,64 @@ const Modal = (props) => {
               </ModalButtonContainer>
             </ModalContainer>
           );
+          case "addProduct":
+              return (
+                <ModalContainer display={props.show} ref={modalRef}>
+                  <ModalTitle>{props.modalTitle}</ModalTitle>
+                  <ModalContent>
+                    <CategoryInput
+                      type="text"
+                      value={props.productID}
+                      onChange={(e) => props.setProductID(e.target.value)}
+                      placeholder="Enter Product ID"
+                      required
+                    />
+                    <CategoryInput
+                      type="text"
+                      value={props.productName}
+                      onChange={(e) => props.setProductName(e.target.value)}
+                      placeholder="Enter Product Name"
+                      required
+                    />
+                    <CategoryInput
+                      type="number"
+                      value={props.productPrice}
+                      onChange={(e) => props.setProductPrice(e.target.value)}
+                      placeholder="Enter Product Price"
+                      min="0"
+                      required
+                    />
+                    <CategoryInput
+                      type="number"
+                      value={props.pv}
+                      onChange={(e) => props.setPv(e.target.value)}
+                      placeholder="Enter PV"
+                      required
+                      min="0"
+                    />
+                  </ModalContent>
+                  <ModalButtonContainer>
+                    <Button
+                      filled={true}
+                      filledColor={props.actionButtonColor}
+                      defaultColor={props.actionButtonColor}
+                      onClick={() => {
+                        closeModal();
+                        props.actionButtonClick(props.productID, props.productName, props.productPrice, props.pv);
+                      }}
+                    >
+                      {props.actionButtonText ? props.actionButtonText : "OK"}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        closeModal();
+                      }}
+                    >
+                      {props.closingButtonText ? props.closingButtonText : "Cancel"}
+                    </Button>
+                  </ModalButtonContainer>
+                </ModalContainer>
+              );
       default:
         return (
           <ModalContainer display={props.show} ref={modalRef}>

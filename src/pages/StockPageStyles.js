@@ -169,3 +169,23 @@ export const StyledLink = styled(Link)`
     text-decoration: underline;
   }
 `;
+
+export const DropdownContainer = styled.div`
+  width:90%;
+  min-width: 1000px;
+  margin-bottom: 1rem;
+`;
+
+export const DropdownHeader = styled.div`
+  background-color: ${props => props.theme.primary};
+  color: white;
+  padding: 1rem;
+  cursor: pointer;
+  font-size:1.2rem;
+`;
+
+export const DropdownContent = styled.div`
+  border: 1px solid ${props => props.theme.primary};
+  padding: 1rem;
+  display: ${props => (props.isOpen ? 'block' : 'none')};
+`;
