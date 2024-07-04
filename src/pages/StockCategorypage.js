@@ -199,7 +199,7 @@ const StockCategorypage = () => {
                     setInputValue("");
                      setAttributes("");
                 }}
-                modalType="addCategory"
+                modalType="editCategory"
                 actionButtonText="Save"
                 actionButtonColor={theme.statusGood}
                 actionButtonClick={() => handleEditCategory(categoryToEdit.id, inputValue, attributes)}

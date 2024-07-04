@@ -178,14 +178,21 @@ export const DropdownContainer = styled.div`
 
 export const DropdownHeader = styled.div`
   background-color: ${props => props.theme.primary};
-  color: white;
-  padding: 1rem;
+  color: ${props => props.theme.white};
   cursor: pointer;
-  font-size:1.2rem;
+  font-size:1rem;
+  display: grid;
+  grid-template-columns: repeat(1, 30% [col-start] 10% [col-middle] 15% [col-end]10%);
+  padding-left: 5%;
+
 `;
 
 export const DropdownContent = styled.div`
   border: 1px solid ${props => props.theme.primary};
   padding: 1rem;
   display: ${props => (props.isOpen ? 'block' : 'none')};
+`;
+export const HeaderContent = styled.div`
+    padding: 5px;
+    align-self: center;
 `;

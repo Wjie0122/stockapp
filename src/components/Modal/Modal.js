@@ -8,7 +8,9 @@ import {
   ModalTitle,
   CategoryInput,
   CategoryOption,
-  CategorySelect
+  CategorySelect,
+  Checkbox,
+  CheckboxLabel
 } from "./ModalStyles";
 import { ThemeProvider } from "styled-components";
 import { theme } from "../../theme";
@@ -167,6 +169,54 @@ const Modal = (props) => {
               </ModalButtonContainer>
             </ModalContainer>
           );
+          case "editCategory":
+          return (
+            <ModalContainer display={props.show} ref={modalRef}>
+              <ModalTitle>{props.modalTitle}</ModalTitle>
+              <ModalContent>
+                {props.modalContent}
+                <CategoryInput
+                  type="text"
+                  value={props.inputValue}
+                  onChange={(e) => props.setInputValue(e.target.value)}
+                  placeholder="Enter category name"
+                  required
+                />
+                  <br/>Has different Color/Size ?
+                <CategorySelect
+                value={props.attributes}
+                onChange={(e) =>
+                  props.setAttributes(e.target.value)
+                }
+                required
+              >
+                <CategoryOption value="" hidden>Select Color/Size Attributes</CategoryOption>
+                <CategoryOption value="true">Yes</CategoryOption>
+                <CategoryOption value="false">No</CategoryOption>
+              </CategorySelect>
+              </ModalContent>
+              <ModalButtonContainer>
+                <Button
+                  filled={true}
+                  filledColor={props.actionButtonColor}
+                  defaultColor={props.actionButtonColor}
+                  onClick={() => {
+                    closeModal();
+                    props.actionButtonClick(props.inputValue, props.attributes);
+                  }}
+                >
+                  {props.actionButtonText ? props.actionButtonText : "OK"}
+                </Button>
+                <Button
+                  onClick={() => {
+                    closeModal();
+                  }}
+                >
+                  {props.closingButtonText ? props.closingButtonText : "Cancel"}
+                </Button>
+              </ModalButtonContainer>
+            </ModalContainer>
+          );
           case "addProduct":
               return (
                 <ModalContainer display={props.show} ref={modalRef}>
@@ -176,7 +226,7 @@ const Modal = (props) => {
                       type="text"
                       value={props.productID}
                       onChange={(e) => props.setProductID(e.target.value)}
-                      placeholder="Enter Product ID"
+                      placeholder="Enter Product Code"
                       required
                     />
                     <CategoryInput
@@ -225,6 +275,138 @@ const Modal = (props) => {
                   </ModalButtonContainer>
                 </ModalContainer>
               );
+          case "addProductType":
+              return (
+                <ModalContainer display={props.show} ref={modalRef}>
+                  <ModalTitle>{props.modalTitle}</ModalTitle>
+                  <ModalContent>
+                    <CategoryInput
+                      type="text"
+                      value={props.productID}
+                      onChange={(e) => props.setProductID(e.target.value)}
+                      placeholder="Enter Product Code"
+                      required
+                    />
+                    <CategoryInput
+                      type="text"
+                      value={props.productName}
+                      onChange={(e) => props.setProductName(e.target.value)}
+                      placeholder="Enter Product Name"
+                      required
+                    />
+                    <Checkbox>
+                      Please tick if has different color.<br/>
+                      <CheckboxLabel>
+                        <CategoryInput
+                          type="checkbox"
+                          checked={props.hasColor}
+                          onChange={(e) => props.setHasColor(e.target.checked)}
+                        />
+                        Color
+                      </CheckboxLabel>
+                    </Checkbox>
+                    <Checkbox>
+                      Please tick if has different size.<br/>
+                      <CheckboxLabel>
+                        <CategoryInput
+                          type="checkbox"
+                          checked={props.hasSize}
+                          onChange={(e) => props.setHasSize(e.target.checked)}
+                        />
+                        Size
+                      </CheckboxLabel>
+                    </Checkbox>
+                  </ModalContent>
+                  <ModalButtonContainer>
+                    <Button
+                      filled={true}
+                      filledColor={props.actionButtonColor}
+                      defaultColor={props.actionButtonColor}
+                      onClick={() => {
+                        closeModal();
+                        props.actionButtonClick(props.productID, props.productName);
+                      }}
+                    >
+                      {props.actionButtonText ? props.actionButtonText : "OK"}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        closeModal();
+                      }}
+                    >
+                      {props.closingButtonText ? props.closingButtonText : "Cancel"}
+                    </Button>
+                  </ModalButtonContainer>
+                </ModalContainer>
+              );
+
+              case "addItem":
+                return (
+                  <ModalContainer display={props.show} ref={modalRef}>
+                    <ModalTitle>{props.modalTitle}</ModalTitle>
+                    <ModalContent>
+                      <CategoryInput
+                        type="text"
+                        value={props.productID}
+                        disabled
+                      />
+                      <CategoryInput
+                        type="text"
+                        value={props.productName}
+                        disabled
+                      />
+                      <CategoryInput
+                        type="number"
+                        value={props.productPrice}
+                        onChange={(e) => props.setProductPrice(e.target.value)}
+                        placeholder="Enter Product Price"
+                        min="0"
+                        required
+                      />
+                      <CategoryInput
+                        type="number"
+                        value={props.pv}
+                        onChange={(e) => props.setPv(e.target.value)}
+                        placeholder="Enter PV"
+                        required
+                        min="0"
+                      />
+                      <CategoryInput
+                        type="text"
+                        value={props.color}
+                        onChange={(e) => props.setColor(e.target.value)}
+                        placeholder="Enter Product Color"
+                      />
+                      <CategoryInput
+                        type="text"
+                        value={props.size}
+                        onChange={(e) => props.setSize(e.target.value)}
+                        placeholder="Enter Product Size"
+                        required
+                      />
+                    </ModalContent>
+                    <ModalButtonContainer>
+                      <Button
+                        filled={true}
+                        filledColor={props.actionButtonColor}
+                        defaultColor={props.actionButtonColor}
+                        onClick={() => {
+                          closeModal();
+                          props.actionButtonClick(props.productID, props.productName, props.productPrice, props.pv);
+                        }}
+                      >
+                        {props.actionButtonText ? props.actionButtonText : "OK"}
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          closeModal();
+                        }}
+                      >
+                        {props.closingButtonText ? props.closingButtonText : "Cancel"}
+                      </Button>
+                    </ModalButtonContainer>
+                  </ModalContainer>
+                );
       default:
         return (
           <ModalContainer display={props.show} ref={modalRef}>

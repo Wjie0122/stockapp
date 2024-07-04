@@ -57,3 +57,10 @@ export const CategorySelect = styled.select`
 `;
 export const CategoryOption = styled.option`
 `;
+
+export const Checkbox = styled.div`
+     text-align: left; 
+     padding: 5px 0 0 55px;
+`;
+export const CheckboxLabel = styled.label`
+`;
