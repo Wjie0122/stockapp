@@ -311,10 +311,36 @@ const handleEditProductType = async (id, newProductID,newName) => {
 
 const handleRemoveProductType = async (id) => {
   try {
-      await deleteDoc(doc(db, "productTypes", id));
-      console.log("Document successfully deleted!");
-      fetchProductTypes(); // Refresh categories after deletion
-      setProductTypeToRemove(null);
+      // Retrieve the productType document to get the productId
+      const productTypeRef = doc(db, "productTypes", id);
+      const productTypeDoc = await getDoc(productTypeRef);
+
+      if (productTypeDoc.exists()) {
+          const productId = productTypeDoc.data().productID;
+
+          // Query products with the matching productId
+          const productsQuery = query(collection(db, "products"), where("productID", "==", productId));
+          const productsSnapshot = await getDocs(productsQuery);
+
+          // Delete each product document
+          const deletePromises = productsSnapshot.docs.map(async (doc) => {
+              await deleteDoc(doc.ref);
+              console.log(`Product document ${doc.id} successfully deleted!`);
+          });
+
+          // Delete the productType document from 'productTypes' collection
+          await deleteDoc(productTypeRef);
+          console.log("ProductType document successfully deleted!");
+
+          // Wait for all deletions to complete
+          await Promise.all(deletePromises);
+
+          // Refresh product types after deletion
+          fetchProductTypes();
+          setProductTypeToRemove(null);
+      } else {
+          console.error("ProductType document not found.");
+      }
   } catch (error) {
       console.error("Error removing document: ", error);
   }
@@ -331,11 +357,12 @@ const handleAddItem = async (color, size, productPrice,pv) => {
       setShowErrorModal2(true);
       return;
     }
-    
+    const capitalizedSize = size.toUpperCase();
+    const capitalizedColor = color.toUpperCase();
 
   try {
   
-      const q = query(collection(db, "products"), where("size", "==", size), where("color", "==", color));
+      const q = query(collection(db, "products"), where("size", "==", capitalizedSize), where("color", "==", capitalizedColor));
 
       const querySnapshot = await getDocs(q);
 
@@ -360,8 +387,8 @@ const handleAddItem = async (color, size, productPrice,pv) => {
       productPrice: Number(productPrice),
       pv: Number(pv),
       productQuantity: 0,
-      color: color,
-      size: size,
+      color: capitalizedColor,
+      size: capitalizedSize,
 
     });
 
@@ -390,11 +417,12 @@ const handleAddItem = async (color, size, productPrice,pv) => {
         setShowErrorModal2(true);
         return;
       }
-      
+      const capitalizedSize = size.toUpperCase();
+    const capitalizedColor = color.toUpperCase();
 
     try {
       
-        const q = query(collection(db, "products"), where("size", "==", size), where("color", "==", color), where("__name__", "!=", productToEdit.id));
+        const q = query(collection(db, "products"), where("size", "==", capitalizedSize), where("color", "==", capitalizedColor), where("__name__", "!=", productToEdit.id));
 
         const querySnapshot = await getDocs(q);
 
@@ -421,9 +449,9 @@ const handleAddItem = async (color, size, productPrice,pv) => {
         productID: productID,
         productPrice: Number(productPrice),
         pv: Number(pv),
-        productQuantity: 0, // Adjust this value based on your requirements
-        color: color,
-        size: size,
+        productQuantity: 0, 
+        color: capitalizedColor,
+        size: capitalizedSize,
       });
 
       console.log("Document written with ID: ", productDocRef.id);
@@ -717,6 +745,10 @@ const handleAddItem = async (color, size, productPrice,pv) => {
             setShowAddItemModal(false);
             setProductID("");
             setProductName("");
+            setProductPrice("");
+            setPv("");
+            setColor("");
+            setSize("");
             setHasColor(false);
             setHasSize(false);
           }}
@@ -742,6 +774,10 @@ const handleAddItem = async (color, size, productPrice,pv) => {
             setShowEditItemModal(false);
             setProductID("");
             setProductName("");
+            setProductPrice("");
+            setPv("");
+            setColor("");
+            setSize("");
             setHasColor(false);
             setHasSize(false);
           }}

@@ -375,13 +375,13 @@ const Modal = (props) => {
                         type="text"
                         value={props.color}
                         onChange={(e) => props.setColor(e.target.value)}
-                        placeholder="Enter Product Color"
+                        placeholder="Enter Product Color/NA"
                       />
                       <CategoryInput
                         type="text"
                         value={props.size}
                         onChange={(e) => props.setSize(e.target.value)}
-                        placeholder="Enter Product Size"
+                        placeholder="Enter Product Size/NA"
                         required
                       />
                     </ModalContent>

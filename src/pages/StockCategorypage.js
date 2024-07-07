@@ -95,9 +95,35 @@ const StockCategorypage = () => {
 
     const handleRemoveCategory = async (categoryId) => {
         try {
+            // Delete all productType documents with the categoryId from 'productTypes' collection
+            const productTypesQuery = query(collection(db, "productTypes"), where("categoryID", "==", categoryId));
+            const productTypesSnapshot = await getDocs(productTypesQuery);
+    
+            // Delete each productType document
+            const deleteProductTypePromises = productTypesSnapshot.docs.map(async (doc) => {
+                await deleteDoc(doc.ref);
+                console.log(`ProductType document ${doc.id} successfully deleted!`);
+            });
+    
+            // Delete all product documents with the categoryId from 'products' collection
+            const productsQuery = query(collection(db, "products"), where("categoryID", "==", categoryId));
+            const productsSnapshot = await getDocs(productsQuery);
+    
+            // Delete each product document
+            const deleteProductPromises = productsSnapshot.docs.map(async (doc) => {
+                await deleteDoc(doc.ref);
+                console.log(`Product document ${doc.id} successfully deleted!`);
+            });
+    
+            // Delete the category document from 'categories' collection
             await deleteDoc(doc(db, "categories", categoryId));
-            console.log("Document successfully deleted!");
-            fetchCategories(); // Refresh categories after deletion
+            console.log("Category document successfully deleted!");
+    
+            // Wait for all deletions to complete
+            await Promise.all([...deleteProductTypePromises, ...deleteProductPromises]);
+    
+            // Refresh categories after deletion
+            fetchCategories();
             setCategoryToRemove(null);
         } catch (error) {
             console.error("Error removing document: ", error);
