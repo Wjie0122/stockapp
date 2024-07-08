@@ -196,3 +196,114 @@ export const HeaderContent = styled.div`
     padding: 5px;
     align-self: center;
 `;
+
+export const OrderContainer = styled.div`
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+`;
+
+export const OrderTitle = styled.h1`
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+`;
+
+export const OrderList = styled.ul`
+    list-style: none;
+    padding: 0;
+`;
+
+export const OrderItem = styled.li`
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+
+    &:hover {
+        text-decoration: underline;
+        background-color: #f0f0f0;
+    }
+`;
+
+export const PaginationNav = styled.nav`
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+`;
+
+export const PaginationList = styled.ul`
+    list-style: none;
+    padding: 0;
+    display: flex;
+`;
+
+export const PaginationItem = styled.li`
+    margin: 0 5px;
+`;
+
+export const PaginationLink = styled.button`
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #007bff;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #007bff;
+        color: #fff;
+    }
+`;
+
+export const OrderDetailContainer = styled.div`
+    width: 80%;
+    margin: 20px auto;
+    border: 1px solid #ddd;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+`;
+
+export const OrderDetailContent = styled.div`
+    margin-bottom: 20px;
+`;
+
+
+export const OrderDetailHeader = styled.h1`
+    margin: 5px 0;
+    display:none;
+`;
+
+export const OrderDetailPara = styled.h2`
+    margin: 5px 0;
+`;
+export const OrderDetailHeader2 = styled.h2`
+    margin-bottom: 10px;
+`;
+export const OrderProductTable = styled.table`
+    width: 100%;
+    border-collapse: collapse;
+`;
+export const OrderProductThead = styled.thead`
+  background-color: #f2f2f2;
+`;
+
+export const OrderProductTh = styled.th`
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+`;
+
+export const OrderProductTd = styled.td`
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: right;
+
+  &:first-child {
+    text-align: left;
+  }
+`;

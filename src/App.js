@@ -8,6 +8,11 @@ import StockAddpage from './pages/StockAddpage';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Suspense } from "react";
 import StockCategorypage from './pages/StockCategorypage';
+import OrderHomepage from './pages/OrderHomepage';
+import OrderDetailpage from './pages/OrderDetailpage';
+import AddStockHomepage from './pages/AddStockHomepage';
+import AddStockDetailpage from './pages/AddStockDetailpage';
+
 
 
 function App() {
@@ -23,6 +28,10 @@ function App() {
           <Route path="/stock/add_stock" element={<StockAddpage />} />
           <Route path="/stock/add_stock" element={<StockAddpage />} />
           <Route path="/stock/order_review*" element={<StockHomepage />} />
+          <Route path="/order" element={<OrderHomepage />} />
+          <Route path="/order/:orderID*" element={<OrderDetailpage />} />
+          <Route path="/add_stock" element={<AddStockHomepage />} />
+          <Route path="/add_stock/:addStockID*" element={<AddStockDetailpage />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

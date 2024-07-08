@@ -22,6 +22,7 @@ import Button from '../components/Button/Button'
 const OrderPage = () => {
     const [selectedProductIDs, setSelectedProductIDs] = useState([]);
     const [customerName, setCustomerName] = useState('');
+    const [customerCode, setCustomerCode] = useState('');
     const [date, setDate] = useState('');
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -257,6 +258,7 @@ const OrderPage = () => {
             // Add order details to the 'orders' collection
             await addDoc(collection(db, 'orders'), {
                 customerName,
+                customerCode,
                 date,
                 orders,
                 timestamp: new Date()
@@ -297,6 +299,13 @@ const OrderPage = () => {
                         placeholder="Customer Name"
                         value={customerName}
                         onChange={(e) => setCustomerName(e.target.value)}
+                        required
+                    />
+                    <StockUpdateInput
+                        type="text"
+                        placeholder="Customer Code"
+                        value={customerCode}
+                        onChange={(e) => setCustomerCode(e.target.value)}
                         required
                     />
                     <StockUpdateInput
