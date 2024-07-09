@@ -72,7 +72,7 @@ const AddStockHomepage = () => {
         {currentOrders.map(order => (
           <OrderItem key={order.id}>
             <Link to={`/add_stock/${order.id}`}>
-              Add Stock ID: {order.id}, Date: {order.date}
+              User: {order.name}, Date: {order.date}
             </Link>
           </OrderItem>
         ))}

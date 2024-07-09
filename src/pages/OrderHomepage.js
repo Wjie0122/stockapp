@@ -1,6 +1,6 @@
 // components/OrderHomepage.js
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '../backend/firebase';
 import {
     OrderContainer,
@@ -25,7 +25,9 @@ const OrderHomepage = () => {
 
   const fetchOrders = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'orders'));
+      const ordersRef = collection(db, 'orders');
+      const q = query(ordersRef, orderBy('date', 'desc'));
+      const querySnapshot = await getDocs(q);
       const ordersData = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
@@ -72,7 +74,7 @@ const OrderHomepage = () => {
         {currentOrders.map(order => (
           <OrderItem key={order.id}>
             <Link to={`/order/${order.id}`}>
-              Order ID: {order.id}, Date: {order.date}
+              Customer: {order.customerName} ({order.customerCode}), Date: {order.date}
             </Link>
           </OrderItem>
         ))}
