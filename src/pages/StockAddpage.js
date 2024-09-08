@@ -15,7 +15,7 @@ import { ThemeProvider } from "styled-components";
 import { theme } from "../theme";
 import { useNavigate } from "react-router-dom";
 import { db } from "../backend/firebase";
-import { collection, addDoc, getDocs, doc, updateDoc, getDoc, where, query } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, updateDoc, getDoc, where, query,orderBy } from 'firebase/firestore';
 import StockRow from '../components/StockRow/StockRow';
 import Button from '../components/Button/Button'
 
@@ -36,7 +36,9 @@ const StockAddPage = () => {
     const navigate = useNavigate();
 
     const fetchCategories = async () => {
-        const categoriesCollection = await getDocs(collection(db, 'categories'));
+        const categoriesRef = collection(db, 'categories'); 
+        const q = query(categoriesRef, orderBy('name', 'asc'));
+        const categoriesCollection = await getDocs(q);
         const categoriesList = categoriesCollection.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
@@ -46,7 +48,11 @@ const StockAddPage = () => {
 
     const fetchProducts = async (categoryID) => {
         const productsRef = collection(db, 'products');
-        const q = query(productsRef, where("categoryID", "==", categoryID));
+        const q = query(
+            productsRef,
+            where('categoryID', '==', categoryID),
+            orderBy('productID', 'asc')
+          );
         const productsCollection = await getDocs(q);
         const productsList = productsCollection.docs.map(doc => ({
             id: doc.id,
@@ -54,8 +60,29 @@ const StockAddPage = () => {
         }));
         // Filter out products that are already selected
         const filteredProducts = productsList.filter(product => !selectedProductIDs.includes(product.id));
-        setAvailableProducts(filteredProducts);
+        setAvailableProducts(sortProducts(filteredProducts));
     };
+    const sortProducts = (products) => {
+        return products.sort((a, b) => {
+          // First, sort by productID
+          if (a.productID < b.productID) return -1;
+          if (a.productID > b.productID) return 1;
+      
+          // Then, sort by color
+          if (!a.color && b.color) return 1; // Place products without color after those with color
+          if (a.color && !b.color) return -1; // Place products with color before those without
+          if (a.color < b.color) return -1;
+          if (a.color > b.color) return 1;
+      
+          // Finally, sort by size
+          if (!a.size && b.size) return 1; // Place products without size after those with size
+          if (a.size && !b.size) return -1; // Place products with size before those without
+          if (a.size < b.size) return -1;
+          if (a.size > b.size) return 1;
+      
+          return 0; // Default case if all fields are equal
+        });
+      };
 
     const fetchProductTypes = async (categoryID) => {
         const productTypesRef = collection(db, 'productTypes');
@@ -79,7 +106,7 @@ const StockAddPage = () => {
         }));
         // Filter out products that are already selected
         const filteredProducts = productsList.filter(product => !selectedProductIDs.includes(product.id));
-        setAvailableProducts(filteredProducts);
+        setAvailableProducts(sortProducts(filteredProducts));
     };
 
     useEffect(() => {

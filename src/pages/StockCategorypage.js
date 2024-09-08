@@ -16,7 +16,7 @@ import { theme } from "../theme";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button/Button";
 import { db } from "../backend/firebase";
-import { collection, getDocs, addDoc, query, where, deleteDoc,doc, updateDoc  } from "firebase/firestore"; 
+import { collection, getDocs, addDoc, query, where, deleteDoc,doc, updateDoc,orderBy  } from "firebase/firestore"; 
 import Modal from "../components/Modal/Modal";
 
 const StockCategorypage = () => {
@@ -45,7 +45,9 @@ const StockCategorypage = () => {
 
     const fetchCategories = async () => {
         try {
-            const querySnapshot = await getDocs(collection(db, "categories"));
+            const categoriesRef = collection(db, 'categories'); 
+            const q = query(categoriesRef, orderBy('name', 'asc'));
+            const querySnapshot = await getDocs(q);
             const categoriesData = querySnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()

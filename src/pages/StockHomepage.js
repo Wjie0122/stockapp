@@ -18,7 +18,7 @@ import { theme } from "../theme";
 import { useNavigate, useParams } from "react-router-dom";
 import Button from "../components/Button/Button";
 import { db } from "../backend/firebase";
-import { collection, deleteDoc, doc, getDocs, query, where, addDoc, updateDoc, getDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, query, where, addDoc, updateDoc, getDoc,orderBy } from "firebase/firestore";
 import Modal from "../components/Modal/Modal";
 
 const StockHomepage = () => {
@@ -74,16 +74,44 @@ const StockHomepage = () => {
 
   const fetchProducts = async () => {
     try {
-      const q = query(collection(db, "products"), where("categoryID", "==", categoryID));
+      const productsRef = collection(db, 'products');
+      const q = query(
+        productsRef,
+        where('categoryID', '==', categoryID),
+        orderBy('productID', 'asc')
+      );
       const querySnapshot = await getDocs(q);
       const productsData = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
-      setProducts(productsData);
+      console.log("Products fetched:", productsData);
+      setProducts(sortProducts(productsData));
     } catch (error) {
       console.error("Error fetching products: ", error);
     }
+  };
+  
+  const sortProducts = (products) => {
+    return products.sort((a, b) => {
+      // First, sort by productID
+      if (a.productID < b.productID) return -1;
+      if (a.productID > b.productID) return 1;
+  
+      // Then, sort by color
+      if (!a.color && b.color) return 1; // Place products without color after those with color
+      if (a.color && !b.color) return -1; // Place products with color before those without
+      if (a.color < b.color) return -1;
+      if (a.color > b.color) return 1;
+  
+      // Finally, sort by size
+      if (!a.size && b.size) return 1; // Place products without size after those with size
+      if (a.size && !b.size) return -1; // Place products with size before those without
+      if (a.size < b.size) return -1;
+      if (a.size > b.size) return 1;
+  
+      return 0; // Default case if all fields are equal
+    });
   };
 
   const fetchProductTypes = async () => {
