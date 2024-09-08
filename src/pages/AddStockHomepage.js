@@ -25,7 +25,7 @@ const AddStockHomepage = () => {
 
   const fetchAddStocks = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'addstocks'));
+      const querySnapshot = await getDocs(collection(db, 'addstocks'), orderBy('date', 'desc'));
       const ordersData = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
