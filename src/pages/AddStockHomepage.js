@@ -41,7 +41,6 @@ const AddStockHomepage = () => {
   useEffect(() => {
     fetchAddStocks();
   }, []);
-
   // Pagination logic
   const indexOfLastOrder = currentPage * addstocksPerPage;
   const indexOfFirstOrder = indexOfLastOrder - addstocksPerPage;
