@@ -1,6 +1,6 @@
 // components/OrderHomepage.js
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs,orderBy } from 'firebase/firestore';
+import { collection, getDocs,orderBy,query } from 'firebase/firestore';
 import { db } from '../backend/firebase';
 import {
     OrderContainer,
@@ -25,7 +25,9 @@ const AddStockHomepage = () => {
 
   const fetchAddStocks = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'addstocks'), orderBy('date', 'desc'));
+      const addstocksRef = collection(db, 'addstocks');
+      const q = query(addstocksRef, orderBy('date', 'desc'));
+      const querySnapshot = await getDocs(q);
       const ordersData = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
